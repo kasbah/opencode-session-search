@@ -48,7 +48,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
 
 fn draw_input(frame: &mut Frame, app: &App, area: Rect) {
     let input = Paragraph::new(Line::from(vec![
-        Span::styled("> ", Style::default().fg(Color::Cyan)),
+        Span::styled("> ", Style::default().fg(Color::Magenta)),
         Span::raw(&app.query),
     ]))
     .block(
@@ -72,7 +72,7 @@ fn draw_table(frame: &mut Frame, app: &App, area: Rect) {
     ])
     .style(
         Style::default()
-            .fg(Color::Cyan)
+            .fg(Color::Magenta)
             .add_modifier(Modifier::BOLD),
     )
     .bottom_margin(1);
