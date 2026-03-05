@@ -1,6 +1,6 @@
 use chrono::DateTime;
 use ratatui::{
-    layout::{Constraint, Layout, Rect},
+    layout::{Alignment, Constraint, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, Cell, Paragraph, Row, Table},
@@ -97,17 +97,46 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
 }
 
 fn draw_input(frame: &mut Frame, app: &App, area: Rect) {
-    let input = Paragraph::new(Line::from(vec![
+    let block = Block::default()
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::DarkGray))
+        .title(" Search sessions ");
+    let inner = block.inner(area);
+    frame.render_widget(block, area);
+
+    let input = Line::from(vec![
         Span::styled("> ", Style::default().fg(Color::Magenta)),
         Span::raw(&app.query),
-    ]))
-    .block(
-        Block::default()
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::DarkGray))
-            .title(" Search sessions "),
-    );
-    frame.render_widget(input, area);
+    ]);
+    frame.render_widget(Paragraph::new(input), inner);
+
+    let active_prefix = if app.query.starts_with("title:") {
+        "title:"
+    } else if app.query.starts_with("mes:") {
+        "mes:"
+    } else if app.query.starts_with("dir:") {
+        "dir:"
+    } else {
+        ""
+    };
+    let dim = Style::default().fg(Color::DarkGray);
+    let active = Style::default().fg(SELECTED_BG);
+    let hint = Line::from(vec![
+        Span::styled(
+            "title:",
+            if active_prefix == "title:" {
+                active
+            } else {
+                dim
+            },
+        ),
+        Span::styled("  ", dim),
+        Span::styled("mes:", if active_prefix == "mes:" { active } else { dim }),
+        Span::styled("  ", dim),
+        Span::styled("dir:", if active_prefix == "dir:" { active } else { dim }),
+        Span::styled(" ", dim),
+    ]);
+    frame.render_widget(Paragraph::new(hint).alignment(Alignment::Right), inner);
 
     // Place cursor after the typed text
     frame.set_cursor_position((area.x + 3 + app.query.len() as u16, area.y + 1));
@@ -244,7 +273,6 @@ fn draw_status(frame: &mut Frame, app: &App, area: Rect) {
             format!("  sort: {sort_label} (F2)"),
             Style::default().fg(Color::DarkGray),
         ),
-        Span::styled("  title: mes: dir:", Style::default().fg(Color::DarkGray)),
         Span::styled(
             "  Enter: open  Esc: quit",
             Style::default().fg(Color::DarkGray),
