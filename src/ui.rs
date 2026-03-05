@@ -139,7 +139,7 @@ fn draw_input(frame: &mut Frame, app: &App, area: Rect) {
     frame.render_widget(Paragraph::new(hint).alignment(Alignment::Right), inner);
 
     // Place cursor after the typed text
-    frame.set_cursor_position((area.x + 3 + app.query.len() as u16, area.y + 1));
+    frame.set_cursor_position((area.x + 3 + app.cursor as u16, area.y + 1));
 }
 
 fn draw_table(frame: &mut Frame, app: &mut App, area: Rect) {

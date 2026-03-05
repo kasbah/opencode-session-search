@@ -15,6 +15,7 @@ pub struct App {
     pub sessions: Vec<Session>,
     pub filtered: Vec<ScoredSession>,
     pub query: String,
+    pub cursor: usize,
     pub selected: usize,
     pub sort_by_date: bool,
     pub result: Option<AppResult>,
@@ -31,6 +32,7 @@ impl App {
             sessions: Vec::new(),
             filtered: Vec::new(),
             query: String::new(),
+            cursor: 0,
             selected: 0,
             sort_by_date: false,
             result: None,
@@ -107,16 +109,48 @@ impl App {
         }
     }
 
-    /// Append a character to the query.
+    /// Insert a character at the cursor position.
     pub fn type_char(&mut self, c: char) {
-        self.query.push(c);
+        self.query.insert(self.cursor, c);
+        self.cursor += c.len_utf8();
         self.update_filter();
     }
 
-    /// Delete the last character from the query.
+    /// Delete the character before the cursor.
     pub fn backspace(&mut self) {
-        self.query.pop();
-        self.update_filter();
+        if self.cursor > 0 {
+            // Find the previous char boundary
+            let prev = self.query[..self.cursor]
+                .char_indices()
+                .next_back()
+                .map(|(i, _)| i)
+                .unwrap_or(0);
+            self.query.remove(prev);
+            self.cursor = prev;
+            self.update_filter();
+        }
+    }
+
+    /// Move cursor left by one character.
+    pub fn move_cursor_left(&mut self) {
+        if self.cursor > 0 {
+            self.cursor = self.query[..self.cursor]
+                .char_indices()
+                .next_back()
+                .map(|(i, _)| i)
+                .unwrap_or(0);
+        }
+    }
+
+    /// Move cursor right by one character.
+    pub fn move_cursor_right(&mut self) {
+        if self.cursor < self.query.len() {
+            self.cursor = self.query[self.cursor..]
+                .char_indices()
+                .nth(1)
+                .map(|(i, _)| self.cursor + i)
+                .unwrap_or(self.query.len());
+        }
     }
 
     /// Toggle between sort-by-score and sort-by-date.

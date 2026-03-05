@@ -76,6 +76,8 @@ fn main() {
                     }
                     KeyCode::Enter => app.confirm(),
                     KeyCode::Backspace => app.backspace(),
+                    KeyCode::Left => app.move_cursor_left(),
+                    KeyCode::Right => app.move_cursor_right(),
                     KeyCode::Up => app.move_up(),
                     KeyCode::Down => app.move_down(),
                     KeyCode::F(2) => app.toggle_sort(),
