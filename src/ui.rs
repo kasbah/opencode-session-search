@@ -199,18 +199,16 @@ fn remap_dir_indices(original: &str, shortened: &str, indices: &[usize]) -> Vec<
 
     // The ~ replaces the home directory prefix. Indices into the home prefix part
     // map to index 0 (~). Indices after the prefix shift left by offset.
+    // offset = home_prefix_len - 1 (since ~ is 1 char replacing home_prefix_len chars)
+    // Characters at indices 0..=offset are in the home prefix, map to 0 (~).
+    // Characters at indices > offset map to idx - offset in the shortened string.
     indices
         .iter()
         .filter_map(|&idx| {
-            if idx < offset {
-                // This character was in the home dir prefix, now replaced by ~
-                // Map to 0 (the ~ char) but deduplicate
+            if idx <= offset {
                 Some(0)
             } else {
-                // Shift left by (offset - 1) since ~ takes 1 char where the prefix took more
-                // But actually: original[offset..] == shortened[1..], so char at original idx
-                // maps to idx - offset + 1
-                let new_idx = idx - offset + 1;
+                let new_idx = idx - offset;
                 if new_idx < short_char_count {
                     Some(new_idx)
                 } else {
