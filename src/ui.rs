@@ -83,7 +83,7 @@ fn highlighted_line<'a>(
     Line::from(spans)
 }
 
-pub fn draw(frame: &mut Frame, app: &App) {
+pub fn draw(frame: &mut Frame, app: &mut App) {
     let chunks = Layout::vertical([
         Constraint::Length(3), // input
         Constraint::Min(5),    // table
@@ -113,7 +113,7 @@ fn draw_input(frame: &mut Frame, app: &App, area: Rect) {
     frame.set_cursor_position((area.x + 3 + app.query.len() as u16, area.y + 1));
 }
 
-fn draw_table(frame: &mut Frame, app: &App, area: Rect) {
+fn draw_table(frame: &mut Frame, app: &mut App, area: Rect) {
     let header = Row::new(vec![
         Cell::from("Title"),
         Cell::from("Last Message"),
@@ -182,7 +182,7 @@ fn draw_table(frame: &mut Frame, app: &App, area: Rect) {
             .border_style(Style::default().fg(Color::DarkGray)),
     );
 
-    frame.render_widget(table, area);
+    frame.render_stateful_widget(table, area, &mut app.table_state);
 }
 
 /// Remap match indices from the original directory path to the shortened display path.
@@ -227,6 +227,16 @@ fn draw_status(frame: &mut Frame, app: &App, area: Rect) {
 
     let sort_label = if app.sort_by_date { "date" } else { "score" };
 
+    let loading_indicator = if app.loading {
+        "  loading sessions..."
+    } else if app.loading_messages {
+        "  loading messages..."
+    } else if let Some(ref err) = app.load_error {
+        return draw_error_status(frame, err, area);
+    } else {
+        ""
+    };
+
     let status = Line::from(vec![
         Span::styled(
             format!(" {count}/{total}"),
@@ -241,6 +251,18 @@ fn draw_status(frame: &mut Frame, app: &App, area: Rect) {
             "  Enter: open  Esc: quit",
             Style::default().fg(Color::DarkGray),
         ),
+        Span::styled(
+            loading_indicator.to_string(),
+            Style::default().fg(Color::Yellow),
+        ),
     ]);
+    frame.render_widget(Paragraph::new(status), area);
+}
+
+fn draw_error_status(frame: &mut Frame, error: &str, area: Rect) {
+    let status = Line::from(vec![Span::styled(
+        format!(" Error: {error}"),
+        Style::default().fg(Color::Red),
+    )]);
     frame.render_widget(Paragraph::new(status), area);
 }
