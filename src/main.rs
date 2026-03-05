@@ -18,8 +18,15 @@ use ratatui::Terminal;
 use app::{App, AppResult};
 
 fn main() {
-    // Check for --db <path> argument
     let args: Vec<String> = std::env::args().collect();
+
+    // Check for --version / -v flag
+    if args.iter().any(|a| a == "--version" || a == "-v") {
+        println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+        return;
+    }
+
+    // Check for --db <path> argument
     let db_override = if let Some(pos) = args.iter().position(|a| a == "--db") {
         args.get(pos + 1).map(|p| PathBuf::from(p))
     } else {

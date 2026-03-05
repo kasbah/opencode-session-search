@@ -1,10 +1,19 @@
 [package]
-name = "opencode-session-explorer"
+name = "opencode-session-search"
 version = "0.1.0"
 edition = "2024"
+authors = ["kasbah <git@kaspar.systems>"]
+description = "Search and resume OpenCode sessions across folders"
+license = "MIT"
+repository = "https://github.com/kasbah/opencode-session-search"
+homepage = "https://github.com/kasbah/opencode-session-search"
+readme = "README.md"
+keywords = ["opencode", "tui", "session", "cli", "fuzzy"]
+categories = ["command-line-utilities"]
+exclude = ["screenshot.png"]
 
 [[bin]]
-name = "ocs"
+name = "opencode-session-search"
 path = "src/main.rs"
 
 [dependencies]
