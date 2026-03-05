@@ -74,6 +74,12 @@ fn main() {
                     KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
                         app.quit()
                     }
+                    KeyCode::Char('a') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                        app.cursor = 0;
+                    }
+                    KeyCode::Char('e') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                        app.cursor = app.query.len();
+                    }
                     KeyCode::Enter => app.confirm(),
                     KeyCode::Backspace => app.backspace(),
                     KeyCode::Left => app.move_cursor_left(),
